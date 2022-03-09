@@ -33,7 +33,7 @@ const svg3 = d3.select("#vis-holder")
                 .attr("viewBox", [0, 0, width, height]);
 
 //TODO: Initialize bars. We will need these to be global.
-let myBars;;
+let myBars;
 
 // Define color scale
 const color = d3.scaleOrdinal()
@@ -58,7 +58,7 @@ d3.csv("data/iris.csv").then((data) => {
     let maxX1 = d3.max(data, (d) => { return d[xKey1]; });
 
     // Create X scale
-    let x1 = d3.scaleLinear()
+    x1 = d3.scaleLinear()
                 .domain([0,maxX1])
                 .range([margin.left, width-margin.right]);
 
@@ -79,7 +79,7 @@ d3.csv("data/iris.csv").then((data) => {
     let maxY1 = d3.max(data, (d) => { return d[yKey1]; });
 
     // Create Y scale
-    let y1 = d3.scaleLinear()
+    y1 = d3.scaleLinear()
                 .domain([0, maxY1])
                 .range([height - margin.bottom, margin.top]);
 
@@ -97,7 +97,7 @@ d3.csv("data/iris.csv").then((data) => {
       );
 
     // Add points
-    const myCircles1 = svg1.selectAll("circle")
+    myCircles1 = svg1.selectAll("circle")
                             .data(data)
                             .enter()
                               .append("circle")
@@ -108,10 +108,14 @@ d3.csv("data/iris.csv").then((data) => {
                               .style("fill", (d) => color(d.Species))
                               .style("opacity", 0.5);
 
+
     //TODO: Define a brush (call it brush1)
+    brush1 = d3.brush().extent([[0,0], [width,height]]);
 
     //TODO: Add brush1 to svg1
-
+     svg1.call(brush1
+      .on("start", clear)
+      .on("brush", updateChart1));
   }
 
   //TODO: Scatterplot 2 (show Sepal width on x-axis and Petal width on y-axis)
@@ -124,7 +128,7 @@ d3.csv("data/iris.csv").then((data) => {
     let maxX2 = d3.max(data, (d) => { return d[xKey2]; });
 
     // Create X scale
-    let x2 = d3.scaleLinear()
+    x2 = d3.scaleLinear()
                 .domain([0,maxX2])
                 .range([margin.left, width-margin.right]);
 
@@ -145,7 +149,7 @@ d3.csv("data/iris.csv").then((data) => {
     let maxY2 = d3.max(data, (d) => { return d[yKey2]; });
 
     // Create Y scale
-    let y2 = d3.scaleLinear()
+    y2 = d3.scaleLinear()
                 .domain([0, maxY2])
                 .range([height - margin.bottom, margin.top]);
 
@@ -163,7 +167,7 @@ d3.csv("data/iris.csv").then((data) => {
       );
 
     // Add points
-    const myCircles2 = svg2.selectAll("circle")
+    myCircles2 = svg2.selectAll("circle")
                             .data(data)
                             .enter()
                               .append("circle")
@@ -173,6 +177,14 @@ d3.csv("data/iris.csv").then((data) => {
                               .attr("r", 8)
                               .style("fill", (d) => color(d.Species))
                               .style("opacity", 0.5);
+
+                                  //TODO: Define a brush (call it brush1)
+  brush2 = d3.brush().extent([[0,0], [width,height]]);
+
+  //TODO: Add brush1 to svg1
+   svg2.call(brush2
+    .on("start", clear)
+    .on("brush", updateChart2));
   }
 
   //TODO: Barchart with counts of different species
@@ -228,7 +240,7 @@ d3.csv("data/iris.csv").then((data) => {
                       .text(xKey3));
 
     // Adds the bars to the chart
-    svg3.selectAll(".bar")
+    myBars = svg3.selectAll(".bar")
      .data(data3)
      .enter()
      .append("rect")
@@ -248,16 +260,25 @@ d3.csv("data/iris.csv").then((data) => {
       svg1.call(brush1.move, null);
 
       //TODO: add code to clear existing brush from svg2
+      svg2.call(brush2.move, null);
   }
 
   // Call when Scatterplot1 is brushed
   function updateChart1(brushEvent) {
 
       //TODO: Find coordinates of brushed region
+      let brushSelection = brushEvent.selection;
 
       //TODO: Give bold outline to all points within the brush region in Scatterplot1
+      myCircles1.classed("highlighted", function(d){
+        return isBrushed(brushSelection, x1(d.Sepal_Length), y1(d.Petal_Length));
+      });
+
 
       //TODO: Give bold outline to all points in Scatterplot2 corresponding to points within the brush region in Scatterplot1
+      myCircles2.classed("highlighted", function(d){
+        return isBrushed(brushSelection, x1(d.Sepal_Length), y1(d.Petal_Length));
+      });
 
   }
 
@@ -265,14 +286,32 @@ d3.csv("data/iris.csv").then((data) => {
   function updateChart2(brushEvent) {
 
     //TODO: Find coordinates of brushed region
+    let brushSelection = brushEvent.selection;
 
     //TODO: Start an empty set that you can store names of selected species in
+    let toBeHighlighted = new Set();
 
     //TODO: Give bold outline to all points within the brush region in Scatterplot2 & collected names of brushed species
+    myCircles2.classed("highlighted", function(d){
+      
+      if(isBrushed(brushSelection, x2(d.Sepal_Width), y2(d.Petal_Width))) {
+        toBeHighlighted.add(d.Species);
+      }
+
+
+      return isBrushed(brushSelection, x2(d.Sepal_Width), y2(d.Petal_Width));
+    });
 
     //TODO: Give bold outline to all points in Scatterplot1 corresponding to points within the brush region in Scatterplot2
+    myCircles1.classed("highlighted", function(d){
+      return isBrushed(brushSelection, x2(d.Sepal_Width), y2(d.Petal_Width));
+    });
 
     //TODO: Give bold outline to all bars in bar chart with corresponding to species selected by Scatterplot2 brush
+    myBars.classed("highlighted", function(d){
+      return toBeHighlighted.has(d.species);
+    });
+
 
   }
 

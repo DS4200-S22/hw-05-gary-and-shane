@@ -2,3 +2,10 @@
 body {
   font-family: Arial;
 }
+
+
+.highlighted {
+  stroke:  black;
+  stroke-width: 4px;
+  opacity: 1;
+}
