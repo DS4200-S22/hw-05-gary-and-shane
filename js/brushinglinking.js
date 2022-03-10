@@ -178,10 +178,10 @@ d3.csv("data/iris.csv").then((data) => {
                               .style("fill", (d) => color(d.Species))
                               .style("opacity", 0.5);
 
-                                  //TODO: Define a brush (call it brush1)
+//TODO: Define a brush (call it brush2)
   brush2 = d3.brush().extent([[0,0], [width,height]]);
 
-  //TODO: Add brush1 to svg1
+  //TODO: Add brush2 to svg2
    svg2.call(brush2
     .on("start", clear)
     .on("brush", updateChart2));
@@ -293,7 +293,7 @@ d3.csv("data/iris.csv").then((data) => {
 
     //TODO: Give bold outline to all points within the brush region in Scatterplot2 & collected names of brushed species
     myCircles2.classed("highlighted", function(d){
-      
+
       if(isBrushed(brushSelection, x2(d.Sepal_Width), y2(d.Petal_Width))) {
         toBeHighlighted.add(d.Species);
       }
