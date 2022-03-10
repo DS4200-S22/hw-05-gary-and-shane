@@ -1,7 +1,7 @@
 # hw-05
 hw-05 - Brushing and Linking 
 
-Link to GitHub Pages: https://ds4200-s22.github.io/hw-05-hw-05-gary-and-shane/
+Link to GitHub Pages: https://ds4200-s22.github.io/hw-05-gary-and-shane/
 
 ## Purpose
 
